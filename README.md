@@ -6,6 +6,14 @@ A mobile web application for AI-assisted nutrition and pain medication tracking 
 
 [https://github.com/mengyuqiao/HNC-Tracker/display.mp4](https://github.com/user-attachments/assets/d73cba85-8227-45ac-b55d-92fad794ac7d)
 
+## Screenshots
+ 
+### Clinician Portal
+ 
+| Login | Patient Dashboard | Patient Detail |
+|---|---|---|
+| ![Clinician Login](screenshots/clinician_view1.jpg) | ![Patient Dashboard](screenshots/clinician_view2.jpg) | ![Patient Detail](screenshots/clinician_view3.jpg) |
+
 ## Overview
 
 HNC patients face high rates of malnutrition (50–80%) and pain during radiotherapy. Uncontrolled pain directly limits food intake, accelerating nutritional decline. This app tracks both together, using an on-device vision-language model (VLM) to minimize patient burden — no manual data entry required.
