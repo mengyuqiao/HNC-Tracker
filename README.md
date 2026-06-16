@@ -4,7 +4,7 @@ A mobile web application for AI-assisted nutrition and pain medication tracking 
 
 ## Demo
 
-[https://github.com/mengyuqiao/HNC-Tracker/display.mp4](https://github.com/mengyuqiao/HNC-Tracker/blob/main/display.mp4)
+[https://github.com/mengyuqiao/HNC-Tracker/display.mp4](https://github.com/user-attachments/assets/d73cba85-8227-45ac-b55d-92fad794ac7d)
 
 ## Overview
 
