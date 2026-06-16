@@ -2,6 +2,10 @@
 
 A mobile web application for AI-assisted nutrition and pain medication tracking in head and neck cancer (HNC) patients undergoing radiation therapy. Built for a feasibility study evaluating real-time monitoring of the pain-nutrition relationship during treatment.
 
+## Demo
+
+https://github.com/mengyuqiao/HNC-Tracker/display.mp4
+
 ## Overview
 
 HNC patients face high rates of malnutrition (50–80%) and pain during radiotherapy. Uncontrolled pain directly limits food intake, accelerating nutritional decline. This app tracks both together, using an on-device vision-language model (VLM) to minimize patient burden — no manual data entry required.
