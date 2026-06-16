@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Pain Rating{% endblock %}
+{% block body_class %}patient-screen screen-pain{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <div class="screen-nav">
+    <a href="{{ url_for('confirm_med') }}" class="back-btn">← Back</a>
+    <h2 class="screen-title-inline">Pain rating</h2>
+  </div>
+
+  <p class="pain-question">How bad was the pain<br><strong>that made you take this medicine?</strong></p>
+
+  <div class="pain-scale">
+    <div class="pain-anchors">
+      <div class="pain-anchor" data-val="0">
+        <div class="pain-circle" data-val="0">0</div>
+        <div class="pain-anchor-label">none</div>
+      </div>
+      <div class="pain-anchor" data-val="3">
+        <div class="pain-circle" data-val="3">3</div>
+        <div class="pain-anchor-label">mild</div>
+      </div>
+      <div class="pain-anchor" data-val="6">
+        <div class="pain-circle" data-val="6">6</div>
+        <div class="pain-anchor-label">moderate</div>
+      </div>
+      <div class="pain-anchor" data-val="9">
+        <div class="pain-circle" data-val="9">9</div>
+        <div class="pain-anchor-label">severe</div>
+      </div>
+    </div>
+    <input type="range" id="painSlider" min="0" max="9" value="5" class="pain-slider">
+  </div>
+
+  <div class="pain-readout" id="painReadout">
+    <span id="painNum">5</span> — <span id="painLabel">moderate</span>
+  </div>
+
+  <form method="POST" id="painForm">
+    <input type="hidden" name="pain_score" id="painScore" value="5">
+    <button type="submit" class="btn btn-primary btn-large" style="margin-top:2rem;">Save</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const labels = ['none','none','mild','mild','moderate','moderate','moderate','severe','severe','severe'];
+  const slider = document.getElementById('painSlider');
+  const numEl  = document.getElementById('painNum');
+  const lblEl  = document.getElementById('painLabel');
+  const scoreEl= document.getElementById('painScore');
+
+  function update(v) {
+    numEl.textContent  = v;
+    lblEl.textContent  = labels[v];
+    scoreEl.value      = v;
+    // Highlight matching anchor circle
+    document.querySelectorAll('.pain-circle').forEach(c => {
+      c.classList.toggle('pain-circle-active', parseInt(c.dataset.val) === parseInt(v));
+    });
+  }
+
+  slider.addEventListener('input', () => update(slider.value));
+
+  document.querySelectorAll('.pain-circle').forEach(c => {
+    c.addEventListener('click', () => {
+      slider.value = c.dataset.val;
+      update(c.dataset.val);
+    });
+  });
+
+  update(5); // init
+</script>
+{% endblock %}

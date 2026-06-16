@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Clinician Login{% endblock %}
+{% block body_class %}clinician-screen screen-login{% endblock %}
+{% block body %}
+<div class="login-wrap">
+  <div class="login-logo">HNC Tracker</div>
+  <div class="login-sub">Clinician Portal</div>
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST" class="login-form">
+    <label class="field-label" for="username">Username</label>
+    <input class="field-input" type="text" id="username" name="username" autocomplete="username" required>
+
+    <label class="field-label" for="password">Password</label>
+    <input class="field-input" type="password" id="password" name="password" autocomplete="current-password" required>
+
+    <button type="submit" class="btn btn-primary btn-large" style="margin-top:1.5rem;">Sign in</button>
+  </form>
+</div>
+{% endblock %}

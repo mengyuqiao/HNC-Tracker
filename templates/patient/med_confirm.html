@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Confirm Medication{% endblock %}
+{% block body_class %}patient-screen{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <div class="screen-nav">
+    <a href="{{ url_for('log_med') }}" class="back-btn">← Back</a>
+    <h2 class="screen-title-inline">Confirm</h2>
+  </div>
+
+  <div class="ai-result-card med-result-card">
+    <div class="ai-result-label">We read this on the label:</div>
+    <div class="med-result-name">{{ data.med_name }}{% if data.dosage %} {{ data.dosage }}{% endif %}</div>
+    {% if data.instructions %}
+    <div class="med-result-instructions">{{ data.instructions }}</div>
+    {% endif %}
+  </div>
+
+  <form method="POST">
+    <button type="submit" name="action" value="confirm" class="btn btn-primary btn-large" style="margin-top:1.5rem;">
+      Yes, that's right
+    </button>
+    <button type="submit" name="action" value="retake" class="btn btn-outline btn-large" style="margin-top:0.75rem;">
+      No, fix this
+    </button>
+  </form>
+</div>
+{% endblock %}

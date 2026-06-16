@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Quick Check-in{% endblock %}
+{% block body_class %}patient-screen screen-pain{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <div class="screen-nav-row">
+    <h2 class="screen-title-inline">Quick check-in</h2>
+    <a href="{{ url_for('patient_home') }}" class="skip-btn">Skip</a>
+  </div>
+
+  <p class="pain-question">How is your pain now?<br>
+    <span class="pain-context">You took {{ log.med_name }} about an hour ago.</span>
+  </p>
+
+  <div class="pain-scale">
+    <div class="pain-anchors">
+      <div class="pain-anchor"><div class="pain-circle" data-val="0">0</div><div class="pain-anchor-label">none</div></div>
+      <div class="pain-anchor"><div class="pain-circle" data-val="3">3</div><div class="pain-anchor-label">mild</div></div>
+      <div class="pain-anchor"><div class="pain-circle" data-val="6">6</div><div class="pain-anchor-label">moderate</div></div>
+      <div class="pain-anchor"><div class="pain-circle" data-val="9">9</div><div class="pain-anchor-label">severe</div></div>
+    </div>
+    <input type="range" id="painSlider" min="0" max="9" value="{{ log.pain_before }}" class="pain-slider">
+  </div>
+
+  <div class="pain-readout" id="painReadout">
+    <span id="painNum">{{ log.pain_before }}</span> — <span id="painLabel">moderate</span>
+  </div>
+
+  <form method="POST" id="painForm">
+    <input type="hidden" name="pain_score" id="painScore" value="{{ log.pain_before }}">
+    <button type="submit" class="btn btn-primary btn-large" style="margin-top:2rem;">Save</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const labels = ['none','none','mild','mild','moderate','moderate','moderate','severe','severe','severe'];
+  const slider = document.getElementById('painSlider');
+  const numEl  = document.getElementById('painNum');
+  const lblEl  = document.getElementById('painLabel');
+  const scoreEl= document.getElementById('painScore');
+  const before = {{ log.pain_before }};
+
+  function update(v) {
+    numEl.textContent = v;
+    lblEl.textContent = labels[v];
+    scoreEl.value = v;
+    // Show delta hint
+    const delta = before - parseInt(v);
+    const readout = document.getElementById('painReadout');
+    let hint = '';
+    if (delta > 2) hint = ` · Down from ${before}. Glad it helped.`;
+    else if (delta < -1) hint = ` · Up from ${before}. We'll let your care team know.`;
+    readout.querySelector('.pain-delta')?.remove();
+    if (hint) {
+      const span = document.createElement('span');
+      span.className = 'pain-delta';
+      span.textContent = hint;
+      readout.appendChild(span);
+    }
+    document.querySelectorAll('.pain-circle').forEach(c => {
+      c.classList.toggle('pain-circle-active', parseInt(c.dataset.val) === parseInt(v));
+    });
+  }
+
+  slider.addEventListener('input', () => update(slider.value));
+  document.querySelectorAll('.pain-circle').forEach(c => {
+    c.addEventListener('click', () => { slider.value = c.dataset.val; update(c.dataset.val); });
+  });
+  update(slider.value);
+</script>
+{% endblock %}

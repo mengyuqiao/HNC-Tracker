@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Dose Saved{% endblock %}
+{% block body_class %}patient-screen screen-saved{% endblock %}
+{% block body %}
+<div class="screen-wrap center-content">
+  <div class="success-icon">✓</div>
+  <h2 class="saved-title">Saved</h2>
+  <p class="saved-sub">Your dose and pain rating were recorded.</p>
+
+  <div class="followup-notice">
+    <span class="followup-bell">🔔</span>
+    <div>
+      We'll check in around
+      <strong>{{ log.followup_due_at.strftime('%-I:%M %p') }}</strong>
+      to see if the medicine helped.
+    </div>
+  </div>
+
+  <a href="{{ url_for('patient_home') }}" class="btn btn-primary btn-large" style="margin-top:2rem;">Done</a>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Enter Your Code{% endblock %}
+{% block body_class %}patient-screen screen-code{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <h2 class="screen-title">Enter your code</h2>
+  <p class="screen-sub">Your care team gave you a 6-digit code on a card.</p>
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <div class="code-display" id="codeDisplay">
+    <span class="code-cell" id="c0"></span>
+    <span class="code-cell" id="c1"></span>
+    <span class="code-cell" id="c2"></span>
+    <span class="code-cell" id="c3"></span>
+    <span class="code-cell" id="c4"></span>
+    <span class="code-cell" id="c5"></span>
+  </div>
+
+  <form method="POST" id="codeForm">
+    <input type="hidden" name="code" id="codeInput">
+    <div class="numpad">
+      {% for n in [1,2,3,4,5,6,7,8,9,'',0,'⌫'] %}
+      <button type="button" class="numpad-key {% if n == '' %}numpad-empty{% endif %}"
+              data-val="{{ n }}">{{ n }}</button>
+      {% endfor %}
+    </div>
+  </form>
+
+  <p class="help-text" style="margin-top:2rem;">
+    Don't have a code?
+    <a href="tel:{{ support_phone }}">Call your care team</a>
+  </p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const cells = document.querySelectorAll('.code-cell');
+  const input = document.getElementById('codeInput');
+  const form  = document.getElementById('codeForm');
+  let code = '';
+
+  document.querySelectorAll('.numpad-key').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.val;
+      if (val === '⌫') {
+        code = code.slice(0, -1);
+      } else if (val !== '' && code.length < 6) {
+        code += val;
+      }
+      // Update display
+      cells.forEach((c, i) => { c.textContent = code[i] || ''; c.classList.toggle('filled', !!code[i]); });
+      // Auto-submit when 6 digits entered
+      if (code.length === 6) {
+        input.value = code;
+        setTimeout(() => form.submit(), 200);
+      }
+    });
+  });
+</script>
+{% endblock %}

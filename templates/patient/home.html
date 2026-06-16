@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block body_class %}patient-screen screen-home{% endblock %}
+{% block body %}
+
+{% set cal_pct = [(today_cal / patient.calorie_goal * 100)|int, 100]|min %}
+
+<div class="home-wrap">
+  <!-- Header -->
+  <div class="home-header">
+    <div>
+      <div class="home-greeting">
+        {% if today_cal == 0 %}Welcome,{% else %}Hi,{% endif %}
+        {{ patient.name.split()[0] }}
+      </div>
+      <div class="home-date">{{ now.strftime('%A, %B %-d') if now else '' }}</div>
+    </div>
+    <a href="{{ url_for('welcome') }}" class="help-btn" title="Help">?</a>
+  </div>
+
+  <!-- Pending follow-up banner -->
+  {% if pending_followup %}
+  <a href="{{ url_for('pain_checkin', log_id=pending_followup.id) }}" class="followup-banner">
+    <span class="followup-bell">🔔</span>
+    <span>Quick check-in: How is your pain now after {{ pending_followup.med_name }}?</span>
+    <span class="followup-arrow">›</span>
+  </a>
+  {% endif %}
+
+  <!-- First-time prompt -->
+  {% if today_cal == 0 and not today_meds %}
+  <div class="info-card">
+    <div class="info-card-title">Let's start your first day</div>
+    <div class="info-card-body">Tap the button below to take a photo of your next meal or drink.</div>
+  </div>
+  {% endif %}
+
+  <!-- Meals logged badge -->
+  {% if today_cal > 0 %}
+  <div class="badge-row">
+    <div class="badge badge-success">⭐ Nice — meal logged!</div>
+  </div>
+  {% endif %}
+
+  <!-- Calorie card -->
+  <div class="stat-card">
+    <div class="stat-card-label">Today's meals</div>
+    <div class="cal-bar-wrap">
+      <div class="cal-bar-track">
+        <div class="cal-bar-fill" style="height: {{ cal_pct }}%"></div>
+        <div class="cal-bar-goal-line" title="Goal: {{ patient.calorie_goal }} cal"></div>
+      </div>
+      <div class="cal-info">
+        <div class="cal-number">{{ today_cal }}</div>
+        <div class="cal-sub">of {{ patient.calorie_goal }} calories</div>
+        {% if today_cal == 0 %}
+        <div class="cal-hint">Your column will fill as you log meals.</div>
+        {% elif cal_pct < 50 %}
+        <div class="cal-hint">Keep going — you can do it!</div>
+        {% elif cal_pct < 100 %}
+        <div class="cal-hint">Great start!</div>
+        {% else %}
+        <div class="cal-hint">Goal reached! 🎉</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Meds card -->
+  <div class="stat-card">
+    <div class="stat-card-label">Pain medicine today</div>
+    {% if today_meds %}
+      {% for m in today_meds %}
+      <div class="med-entry">
+        <span class="med-name">{{ m.med_name }}</span>
+        <span class="med-time">{{ m.logged_at.strftime('%-I:%M %p') }}</span>
+        <span class="pain-chip pain-{{ m.pain_before_label }}">Pain {{ m.pain_before }}/9</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No doses logged yet</div>
+    {% endif %}
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-btns">
+    <a href="{{ url_for('log_food') }}" class="btn btn-primary btn-large">
+      <span class="btn-icon">🍽</span> Log a meal
+    </a>
+    <a href="{{ url_for('log_med') }}" class="btn btn-secondary btn-large">
+      <span class="btn-icon">💊</span> Log pain medicine
+    </a>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  // Set today's date display
+  const d = new Date();
+  const opts = { weekday:'long', month:'long', day:'numeric' };
+  const dateEl = document.querySelector('.home-date');
+  if (dateEl) dateEl.textContent = d.toLocaleDateString('en-US', opts);
+
+  // Poll for pending follow-ups every 60 seconds
+  setInterval(async () => {
+    const res = await fetch('/api/pending-followup');
+    const data = await res.json();
+    if (data.pending && !document.querySelector('.followup-banner')) {
+      location.reload();
+    }
+  }, 60000);
+</script>
+{% endblock %}

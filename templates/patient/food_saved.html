@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Meal Saved{% endblock %}
+{% block body_class %}patient-screen screen-saved{% endblock %}
+{% block body %}
+<div class="screen-wrap center-content">
+  <div class="success-icon">✓</div>
+  <h2 class="saved-title">Saved!</h2>
+  <p class="saved-sub">{{ log.description }} was recorded.</p>
+
+  <div class="saved-summary">
+    <div class="saved-summary-row">
+      <span>This meal</span>
+      <span><strong>{{ log.calories }} cal</strong></span>
+    </div>
+    <div class="saved-summary-row">
+      <span>Today's total</span>
+      <span><strong>{{ today_cal }} of {{ goal }} cal</strong></span>
+    </div>
+    <div class="saved-progress">
+      {% set pct = [(today_cal / goal * 100)|int, 100]|min %}
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ pct }}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <a href="{{ url_for('patient_home') }}" class="btn btn-primary btn-large" style="margin-top:2rem;">Done</a>
+</div>
+{% endblock %}

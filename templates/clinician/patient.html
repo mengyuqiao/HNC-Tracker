@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.name }}{% endblock %}
+{% block body_class %}clinician-screen{% endblock %}
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+{% block body %}
+<div class="clinician-wrap">
+  <div class="clinician-header">
+    <div>
+      <a href="{{ url_for('clinician_dashboard') }}" class="back-link">← All patients</a>
+      <h1 class="clinician-title">{{ patient.name }}</h1>
+      <div class="clinician-sub">DOB: {{ patient.birthdate }} · Goal: {{ patient.calorie_goal }} cal/day</div>
+    </div>
+  </div>
+
+  <!-- Summary chips -->
+  <div class="summary-chips">
+    <div class="chip">
+      <span class="chip-label">Today's calories</span>
+      <span class="chip-val">{{ patient.today_calories() }}</span>
+    </div>
+    <div class="chip">
+      <span class="chip-label">Meds logged today</span>
+      <span class="chip-val">{{ patient.today_med_logs()|length }}</span>
+    </div>
+    {% set last_med = med_logs[-1] if med_logs else None %}
+    {% if last_med %}
+    <div class="chip">
+      <span class="chip-label">Last pain score</span>
+      <span class="chip-val">{{ last_med.pain_before }}/9</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Calorie chart -->
+  <div class="chart-card">
+    <div class="chart-title">Daily Calorie Intake (last 14 days)</div>
+    <div class="chart-wrap">
+      <canvas id="calChart"></canvas>
+    </div>
+    <div class="chart-goal-note">Dashed line = {{ patient.calorie_goal }} cal goal</div>
+  </div>
+
+  <!-- Pain chart -->
+  <div class="chart-card">
+    <div class="chart-title">Pain Before / After Medication</div>
+    <div class="chart-wrap">
+      <canvas id="painChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Med log table -->
+  <div class="chart-card">
+    <div class="chart-title">Medication Log</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Time</th><th>Medication</th><th>Pain before</th><th>Pain after</th></tr>
+      </thead>
+      <tbody>
+        {% for m in med_logs|reverse %}
+        <tr class="{% if m.pain_before >= 7 %}row-flag{% endif %}">
+          <td>{{ m.logged_at.strftime('%b %-d, %-I:%M %p') }}</td>
+          <td>{{ m.med_name }}{% if m.med_dosage %} {{ m.med_dosage }}{% endif %}</td>
+          <td><span class="pain-chip pain-{{ m.pain_before_label }}">{{ m.pain_before }}</span></td>
+          <td>
+            {% if m.pain_after is not none %}
+              <span class="pain-chip pain-{{ m.pain_after_label }}">{{ m.pain_after }}</span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const calData   = {{ daily_calories | tojson }};
+const painData  = {{ pain_timeline  | tojson }};
+const goal      = {{ patient.calorie_goal }};
+
+// ── Calorie chart ──────────────────────────────────────────────────────
+const calLabels = Object.keys(calData).sort();
+const calVals   = calLabels.map(d => calData[d]);
+
+new Chart(document.getElementById('calChart'), {
+  type: 'bar',
+  data: {
+    labels: calLabels.map(d => {
+      const dt = new Date(d + 'T12:00:00');
+      return dt.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    }),
+    datasets: [{
+      label: 'Calories',
+      data: calVals,
+      backgroundColor: calVals.map(v => v < goal * 0.5 ? '#d4860a' : '#2a7d4f'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      annotation: {}
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#e8e8e8' },
+      }
+    }
+  }
+});
+
+// Draw goal line manually after render
+// ── Pain chart ─────────────────────────────────────────────────────────
+const painLabels = painData.map(e => {
+  const dt = new Date(e.date);
+  return dt.toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'numeric'});
+});
+
+new Chart(document.getElementById('painChart'), {
+  type: 'line',
+  data: {
+    labels: painLabels,
+    datasets: [
+      {
+        label: 'Pain before med',
+        data: painData.map(e => e.pain_before),
+        borderColor: '#c0622f',
+        backgroundColor: 'rgba(192,98,47,0.1)',
+        tension: 0.3,
+        pointRadius: 5,
+      },
+      {
+        label: 'Pain after med',
+        data: painData.map(e => e.pain_after),
+        borderColor: '#2a7d4f',
+        backgroundColor: 'rgba(42,125,79,0.1)',
+        tension: 0.3,
+        pointRadius: 5,
+        borderDash: [4,4],
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { min: 0, max: 9, grid: { color: '#e8e8e8' } }
+    }
+  }
+});
+</script>
+{% endblock %}

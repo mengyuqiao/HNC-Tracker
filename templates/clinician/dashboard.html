@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body_class %}clinician-screen{% endblock %}
+{% block body %}
+<div class="clinician-wrap">
+  <div class="clinician-header">
+    <div>
+      <h1 class="clinician-title">Patient Dashboard</h1>
+      <div class="clinician-sub">{{ today.strftime('%A, %B %-d, %Y') }} · {{ clinician.name }}</div>
+    </div>
+    <a href="{{ url_for('clinician_logout') }}" class="btn btn-outline btn-sm">Sign out</a>
+  </div>
+
+  <div class="patient-grid">
+    {% for d in patient_data %}
+    {% set p = d.patient %}
+    <a href="{{ url_for('clinician_patient', patient_id=p.id) }}" class="patient-card {% if d.flag_pain or d.flag_nutrition %}patient-card-flagged{% endif %}">
+      <div class="patient-card-header">
+        <span class="patient-name">{{ p.name }}</span>
+        <span class="patient-flags">
+          {% if d.flag_nutrition %}<span class="flag flag-nutrition" title="Low calorie intake">🍽</span>{% endif %}
+          {% if d.flag_pain %}<span class="flag flag-pain" title="High pain reported">⚠️</span>{% endif %}
+        </span>
+      </div>
+
+      <!-- Calorie progress -->
+      <div class="mini-stat">
+        <span class="mini-stat-label">Calories today</span>
+        <span class="mini-stat-val">{{ d.today_cal }} / {{ p.calorie_goal }}</span>
+      </div>
+      <div class="mini-progress">
+        <div class="mini-progress-fill {% if d.cal_pct < 50 %}mini-progress-low{% endif %}"
+             style="width: {{ [d.cal_pct, 100]|min }}%"></div>
+      </div>
+
+      <!-- Last med -->
+      <div class="mini-stat" style="margin-top:0.5rem;">
+        <span class="mini-stat-label">Last medication</span>
+        <span class="mini-stat-val">
+          {% if d.last_med %}
+            {{ d.last_med.med_name }} · Pain {{ d.last_med.pain_before }}/9
+          {% else %}
+            None logged
+          {% endif %}
+        </span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Check-in Saved{% endblock %}
+{% block body_class %}patient-screen screen-saved{% endblock %}
+{% block body %}
+<div class="screen-wrap center-content">
+  <div class="success-icon">✓</div>
+  <h2 class="saved-title">Thank you</h2>
+  {% if log.pain_after is not none and log.pain_before is not none %}
+    {% if log.pain_before - log.pain_after > 2 %}
+    <p class="saved-sub">Pain went from <strong>{{ log.pain_before }}</strong> to <strong>{{ log.pain_after }}</strong>. Glad the medicine helped!</p>
+    {% elif log.pain_after >= 7 %}
+    <p class="saved-sub">Pain is still high at <strong>{{ log.pain_after }}</strong>. Your care team can see this — reach out if you need support.</p>
+    {% else %}
+    <p class="saved-sub">Your follow-up pain level of <strong>{{ log.pain_after }}</strong> was recorded.</p>
+    {% endif %}
+  {% endif %}
+  <a href="{{ url_for('patient_home') }}" class="btn btn-primary btn-large" style="margin-top:2rem;">Done</a>
+</div>
+{% endblock %}

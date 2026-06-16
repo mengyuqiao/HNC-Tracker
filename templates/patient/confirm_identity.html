@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Is this you?{% endblock %}
+{% block body_class %}patient-screen screen-confirm-id{% endblock %}
+{% block body %}
+<div class="screen-wrap center-content">
+  <p class="confirm-label">Is this you?</p>
+  <div class="identity-card">
+    <div class="identity-name">{{ patient.name }}</div>
+    <div class="identity-dob">Birth date: {{ patient.birthdate }}</div>
+  </div>
+  <form method="POST">
+    <button type="submit" name="confirm" value="yes" class="btn btn-primary btn-large">
+      Yes, that is me
+    </button>
+    <button type="submit" name="confirm" value="no" class="btn btn-outline btn-large" style="margin-top:0.75rem;">
+      No, that is not me
+    </button>
+  </form>
+  <p class="help-text" style="margin-top:2rem;">
+    Need help? <a href="tel:{{ support_phone }}">Call care team</a>
+  </p>
+</div>
+{% endblock %}

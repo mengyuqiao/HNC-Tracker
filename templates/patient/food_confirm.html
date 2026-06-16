@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}How much did you eat?{% endblock %}
+{% block body_class %}patient-screen{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <div class="screen-nav">
+    <a href="{{ url_for('log_food') }}" class="back-btn">← Retake</a>
+    <h2 class="screen-title-inline">Confirm meal</h2>
+  </div>
+
+  <div class="ai-result-card">
+    <div class="ai-result-label">We think this is:</div>
+    <div class="ai-result-food">{{ data.description }}</div>
+    <div class="ai-result-cal">~{{ data.calories }} calories</div>
+  </div>
+
+  <p class="screen-sub" style="margin-top:1.5rem;">How much of this did you eat?</p>
+
+  <form method="POST">
+    <div class="portion-options">
+      <label class="portion-option">
+        <input type="radio" name="portion" value="less">
+        <div class="portion-card">
+          <div class="portion-icon">🍽️</div>
+          <div class="portion-label">Less than shown</div>
+        </div>
+      </label>
+      <label class="portion-option">
+        <input type="radio" name="portion" value="all" checked>
+        <div class="portion-card portion-card-selected">
+          <div class="portion-icon">✅</div>
+          <div class="portion-label">About this much</div>
+        </div>
+      </label>
+      <label class="portion-option">
+        <input type="radio" name="portion" value="more">
+        <div class="portion-card">
+          <div class="portion-icon">➕</div>
+          <div class="portion-label">More than shown</div>
+        </div>
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-large" style="margin-top:1.5rem;">Save meal</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.querySelectorAll('.portion-option input').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.portion-card').forEach(c => c.classList.remove('portion-card-selected'));
+      radio.closest('.portion-option').querySelector('.portion-card').classList.add('portion-card-selected');
+    });
+  });
+</script>
+{% endblock %}

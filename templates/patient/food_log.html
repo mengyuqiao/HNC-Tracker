@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Log a Meal{% endblock %}
+{% block body_class %}patient-screen screen-camera{% endblock %}
+{% block body %}
+<div class="screen-wrap">
+  <div class="screen-nav">
+    <a href="{{ url_for('patient_home') }}" class="back-btn">← Back</a>
+    <h2 class="screen-title-inline">Log a meal</h2>
+  </div>
+  <p class="screen-sub">Take a photo of your meal or drink.</p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}<div class="alert alert-error">{{ messages[0] }}</div>{% endif %}
+  {% endwith %}
+
+  <!-- Camera viewfinder -->
+  <div class="camera-wrap" id="cameraWrap">
+    <video id="cameraVideo" autoplay playsinline></video>
+    <div class="camera-overlay">
+      <div class="camera-frame"></div>
+      <p class="camera-hint">Center your meal in the frame</p>
+    </div>
+    <canvas id="cameraCanvas" style="display:none;"></canvas>
+  </div>
+
+  <!-- Preview after capture -->
+  <div class="preview-wrap" id="previewWrap" style="display:none;">
+    <img id="previewImg" src="" alt="Your photo">
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" id="uploadForm">
+    <input type="file" name="photo" id="photoInput" accept="image/*" capture="environment" style="display:none;">
+
+    <div id="captureControls">
+      <button type="button" class="btn btn-primary btn-large" id="captureBtn">
+        📷 Take photo
+      </button>
+      <button type="button" class="btn btn-outline btn-large" id="uploadBtn" style="margin-top:0.5rem;">
+        Choose from library
+      </button>
+    </div>
+
+    <div id="confirmControls" style="display:none;">
+      <button type="submit" class="btn btn-primary btn-large">Use this photo</button>
+      <button type="button" class="btn btn-outline btn-large" id="retakeBtn" style="margin-top:0.5rem;">Retake</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script>initCamera('food');</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block body_class %}patient-screen screen-welcome{% endblock %}
+{% block body %}
+<div class="screen-wrap center-content">
+  <div class="app-logo">
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="16" fill="var(--color-primary)"/>
+      <path d="M32 14 L32 50 M14 32 L50 32" stroke="white" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="32" cy="32" r="10" stroke="white" stroke-width="3" fill="none"/>
+    </svg>
+  </div>
+  <h1 class="welcome-title">Welcome</h1>
+  <p class="welcome-sub">This app helps you track<br>your meals and pain medicine.</p>
+  <div class="spacer"></div>
+  <a href="{{ url_for('enter_code') }}" class="btn btn-primary btn-large">Get started</a>
+  <p class="help-text">Need help? Call <a href="tel:{{ support_phone }}">{{ support_phone }}</a></p>
+</div>
+{% endblock %}
